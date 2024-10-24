@@ -102,16 +102,17 @@ async function run() {
     app.put('/update-class/:id', async (req, res) =>{
       const id = req.params.id;
       const updateClass = req.body;
+      const { name, description, price, availableSeats, videoLink } = updateClass
       const filter = {_id: new ObjectId(id)};
       // Set the upsert option to insert a document if no documents match the filter
       const options = { upsert: true };
       const updateDoc = {
         $set:{
-          name: updateClass.name,
-          description: updateClass.description,
-          price: updateClass.price,
-          availableSeats: parseInt(updateClass.availableSeats),
-          videoLink: updateClass.videoLink,
+          name: name,
+          description: description,
+          price: price,
+          availableSeats: parseInt(availableSeats),
+          videoLink: videoLink,
           status: 'pending'
         }
       };
