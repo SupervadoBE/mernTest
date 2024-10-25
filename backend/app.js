@@ -133,7 +133,7 @@ async function run() {
       const email = req.body.email;
       const query = {
         classId: id,
-        userMail: email
+        email: email
       };
       const projection = {classId: 1};
       const result = await cartCollections.findOne(query, {projection: projection})
@@ -143,11 +143,11 @@ async function run() {
     // cart info by user email
     app.get('/cart/:email', async (req, res) =>{
       const email = req.params.email;
-      const query = {userMail: email};
+      const query = {email: email};
       const projection = { classId: 1 };
-      const carts = await cartCollections.find(query, {projection: projection});
-      const classId = carts.map((cart) => new ObjectId(cart.classId));
-      const query2 = {_id: {$in: classId}};
+      const carts = await cartCollections.find(query, {projection: projection}).toArray();
+      const classIds = carts.map((cart) => new ObjectId(cart.classId));
+      const query2 = {_id: {$in: classIds}};
       const result = await classesCollections.find(query2).toArray();
       res.send(result);
     })
