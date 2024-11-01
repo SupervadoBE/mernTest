@@ -8,6 +8,14 @@ const port = 3000
 app.use(cors());
 app.use(express.json())
 
+var Iyzipay = require('iyzipay')
+
+var iyzipay = new Iyzipay({
+  apiKey: process.env.SP_API,
+  secretKey: process.env.SP_KEY,
+  uri: process.env.SP_URL
+})
+
 // --------- MongoDB Connection Start --------------
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
@@ -155,12 +163,95 @@ async function run() {
     // delete cart item
     app.delete('/delete-cart-item/:id', async (req, res) =>{
         const id = req.params.id;
-        const query = {classId: id};
+        const query = {_id: new ObjectId(id)};
         const result = await cartCollections.deleteOne(query);
         res.send(result);
     })
 
     // * Peyment Routes -----
+    app.post('/create-payment-intent', async (req, res) =>{
+      const request = {
+        locale: Iyzipay.LOCALE.TR,
+        conversationId: req.body.conversationId,
+        price: req.body.price,
+        paidPrice: req.body.paidPrice,
+        currency: Iyzipay.CURRENCY.TRY,
+        installment: req.body.installment,
+        basketId: req.body.basketId,
+        paymentChannel: Iyzipay.PAYMENT_CHANNEL.WEB,
+        paymentGroup: Iyzipay.PAYMENT_GROUP.PRODUCT,
+        paymentCard: {
+            cardHolderName: req.body.paymentCard.cardHolderName,
+            cardNumber: req.body.paymentCard.cardNumber,
+            expireMonth: req.body.paymentCard.expireMonth,
+            expireYear: req.body.paymentCard.expireYear,
+            cvc: req.body.paymentCard.cvc,
+            registerCard: req.body.paymentCard.registerCard
+        },
+        buyer: {
+            id: req.body.buyer.id,
+            name: req.body.buyer.name,
+            surname: req.body.buyer.surname,
+            gsmNumber: req.body.buyer.gsmNumber,
+            email: req.body.buyer.email,
+            identityNumber: req.body.buyer.identityNumber,
+            lastLoginDate: req.body.buyer.lastLoginDate,
+            registrationDate: req.body.buyer.registrationDate,
+            registrationAddress: req.body.buyer.registrationAddress,
+            ip: req.body.buyer.ip,
+            city: req.body.buyer.city,
+            country: req.body.buyer.country,
+            zipCode: req.body.buyer.zipCode
+        },
+        shippingAddress: {
+            contactName: req.body.shippingAddress.contactName,
+            city: req.body.shippingAddress.city,
+            country: req.body.shippingAddress.country,
+            address: req.body.shippingAddress.address,
+            zipCode: req.body.shippingAddress.zipCode
+        },
+        billingAddress: {
+            contactName: req.body.billingAddress.contactName,
+            city: req.body.billingAddress.city,
+            country: req.body.billingAddress.country,
+            address: req.body.billingAddress.address,
+            zipCode: req.body.billingAddress.zipcode
+        },
+        basketItems: [
+            {
+                id: req.body.basketItems[0].id,
+                name: req.body.basketItems[0].name,
+                category1: req.body.basketItems[0].category1,
+                category2: req.body.basketItems[0].category2,
+                itemType: Iyzipay.BASKET_ITEM_TYPE.PHYSICAL,
+                price: req.body.basketItems[0].price
+            },
+            {
+                id: req.body.basketItems[1].id,
+                name: req.body.basketItems[1].name,
+                category1: req.body.basketItems[1].category1,
+                category2: req.body.basketItems[1].category2,
+                itemType: Iyzipay.BASKET_ITEM_TYPE.VIRTUAL,
+                price: req.body.basketItems[1].price
+            },
+            {
+                id: req.body.basketItems[2].id,
+                name: req.body.basketItems[2].name,
+                category1: req.body.basketItems[2].category1,
+                category2: req.body.basketItems[2].category2,
+                itemType: Iyzipay.BASKET_ITEM_TYPE.PHYSICAL,
+                price: req.body.basketItems[2].price
+            }
+        ]
+    };
+
+
+      const seewhat = await iyzipay.payment.create(request, function(err, result){
+        console.log(err, result);
+        res.send(result)
+      })
+      //res.send(seewhat)
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
