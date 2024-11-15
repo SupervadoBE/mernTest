@@ -12,9 +12,9 @@
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "iyzipay": "^2.0.61",
+    "express": "^4.21.1",
+    "iyzipay": "^2.0.62",
     "mongodb": "^6.5.0",
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.7"
   }
 }

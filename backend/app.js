@@ -243,14 +243,13 @@ async function run() {
                 price: req.body.basketItems[2].price
             }
         ]
-    };
+      };
 
 
-      const seewhat = await iyzipay.payment.create(request, function(err, result){
+      const seewhat = iyzipay.payment.create(request, function(err, result){
         console.log(err, result);
         res.send(result)
       })
-      //res.send(seewhat)
     })
 
     // Send a ping to confirm a successful connection
