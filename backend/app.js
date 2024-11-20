@@ -152,8 +152,8 @@ async function run() {
     app.get('/cart/:email', async (req, res) =>{
       const email = req.params.email;
       const query = {email: email};
-      const projection = { classId: 1 };
-      const carts = await cartCollections.find(query, {projection: projection}).toArray();
+      const projection = { classId: 1 };  // * Using this line gives us the following ->>
+      const carts = await cartCollections.find(query, {projection: projection}).toArray(); // * ->> Only the selected one comes from the DB (projection: classId: 1 (true))
       const classIds = carts.map((cart) => new ObjectId(cart.classId));
       const query2 = {_id: {$in: classIds}};
       const result = await classesCollections.find(query2).toArray();
